@@ -1,27 +1,20 @@
 "use client";
 import { useState } from 'react';
-
+import DogFactService from './services'; // Importer la classe de services
 
 export default function Home() {
-  const [inputValue, setInputValue] = useState(''); // État pour stocker la valeur du champ d'écriture
+  const [inputValue, setInputValue] = useState<number | string>(""); // État pour stocker la valeur du champ d'écriture
   const [message, setMessage] = useState<string | null>(null);
   const [ErrMessage, setErrMessage] = useState<string | null>(null);
 
 // BUTTON FUNCTIONS LINKED TO THE BACKEND
   const handleGetAll = async() => {
     try {
-      const response = await fetch(`http://localhost:8000/dog-facts-all`, {method: 'GET'});
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.detail);
-      }
-      const result = await response.json();
+      const result = await DogFactService.getAll();
       setMessage(result);
       setErrMessage(null);
-      console.log(result); // Affiche les données récupérées
-    } catch (error : any) {
-      console.error(error);
-      setErrMessage(error.message); 
+    } catch (error: any) {
+      setErrMessage(error.message);
     }
   };
 
@@ -29,18 +22,11 @@ export default function Home() {
 
   const handleGet = async() => {
     try {
-      const response = await fetch(`http://localhost:8000/dog-facts/${inputValue}`, {method: 'GET'});
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.detail);
-      }
-      const result = await response.json();
+      const result = await DogFactService.get(inputValue);
       setMessage(result);
       setErrMessage(null);
-      console.log(result); // Affiche les données récupérées
-    } catch (error : any) {
-      console.error(error);
-      setErrMessage(error.message); 
+    } catch (error: any) {
+      setErrMessage(error.message);
     }
   };
 
@@ -48,17 +34,11 @@ export default function Home() {
 
   const handlePost = async () => {
     try {
-      const response = await fetch('http://localhost:8000/dog-facts', {method: 'POST'});
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.detail);
-      }
-      const result = await response.json();
+      const result = await DogFactService.post();
       setMessage(result);
-      console.log(result); // Affiche la réponse après l'envoi
-    } catch (error : any) {
-      console.error(error);
-      setErrMessage(error.message); 
+      setErrMessage(null);
+    } catch (error: any) {
+      setErrMessage(error);
     }
   };
 
@@ -66,44 +46,24 @@ export default function Home() {
 
   const handlePut = async() => {
     try {
-      const response = await fetch(`http://localhost:8000/dog-facts/${inputValue}`, {
-        method: 'PUT',
-        headers :{'Accept': 'application/json','Content-Type': 'application/json',},
-        body: JSON.stringify({test :"test" }),
-        }); // 
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.detail);
-      }
-      const result = await response.json();
+      const result = await DogFactService.put(inputValue);
       setMessage(result);
       setErrMessage(null);
-      console.log(result); // Affiche la réponse après la mise à jour
-    } catch (error : any) {
-      console.error(error);
-      setErrMessage(error.message); 
+    } catch (error: any) {
+      setErrMessage(error.message);
     }
-  };
+  }
+
   //-----------------------------------------------------------------------------------------//
   const handleDelete = async() => {
     try {
-      const response = await fetch(`http://localhost:8000/dog-facts/${inputValue}`, {
-        method: 'DELETE',
-        headers :{'Accept': 'application/json','Content-Type': 'application/json',},
-        });
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.detail);
-      }
-      const result = await response.json();
+      const result = await DogFactService.delete(inputValue);
       setMessage(result);
       setErrMessage(null);
-      console.log(result); // Affiche la réponse après la mise à jour
-    } catch (error : any) {
-      console.error(error);
-      setErrMessage(error.message); 
+    } catch (error: any) {
+      setErrMessage(error.message);
     }
-  };
+  }
   return (
     <div className="flex flex-col items-center h-screen">
       <h1 className="text-5xl font-bold text-center mt-8" >

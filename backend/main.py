@@ -22,14 +22,6 @@ app.add_middleware(
     allow_headers=["*"],  # En-têtes autorisés
 )
 
-logger = logging.getLogger("uvicorn.error")
-
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    logger.info(f"Request: {request.method} {request.url}")
-    response = await call_next(request)
-    return response
-
 @app.get("/")
 async def read_root():
     print("this is a root!")
@@ -43,24 +35,20 @@ async def post_dog_fact():
     with open('dog-facts.txt', 'a') as file:
         file.write(myjson["facts"][0] + "\n")
     with open('dog-facts.txt', 'r') as file:
-        return "".join(file.readlines())    
-    
-@app.options("/dog-facts/{id}")
-async def options_handler(id: int):
-    return {"status": "preflight"}
+        return {"message": "".join(file.readlines())}    
 
 @app.get("/dog-facts/{fact_id}")
 async def get_dog_fact(fact_id : int):
     with open('dog-facts.txt', 'r') as file:
         for i, line in enumerate(file):
             if i == fact_id:  
-                return line 
+                return {"message" : line} 
     raise HTTPException(status_code=404, detail=f"fact index must belong to the list (max index = {len(file)}")
 
 @app.get("/dog-facts-all")
 async def get_dog_fact_():
     with open('dog-facts.txt', 'r') as file:
-        return "".join(file.readlines()) 
+        return {"message":"".join(file.readlines())} 
     raise HTTPException(status_code=404, detail=f"fact index must belong to the list (max index = {len(file)}")
 
 # PUT - Remplacer une line spécifique de dog-facts.txt en utilisant l'api 'dog-api.kinduff' pour obtenir un fait random
@@ -85,7 +73,7 @@ async def put_dog_fact(fact_id: int):
         
         os.replace(temp_file_path, 'dog-facts.txt')
     with open('dog-facts.txt', 'r') as file:
-        return "".join(file.readlines())
+        return {"message":"".join(file.readlines())}
 
 # DELETE - Supprimer un fait sur les chiens
 @app.delete("/dog-facts/{fact_id}")
@@ -103,6 +91,6 @@ async def remove_dog_fact(fact_id: int):
             raise HTTPException(status_code=400, detail=f"Invalid index: {fact_id}. It must be between 0 and {i}.")
         os.replace(temp_file_path, 'dog-facts.txt')
     with open('dog-facts.txt', 'r') as file:
-        return "".join(file.readlines())
+        return {"message":"".join(file.readlines())}
     
         
